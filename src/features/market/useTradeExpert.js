@@ -1,10 +1,4 @@
-import {
-  useState,
-  useContext,
-  createContext,
-  useMemo,
-  useCallback,
-} from "react";
+import { useState, useContext, createContext, useMemo } from "react";
 
 const ctx = createContext();
 const { Provider } = ctx;
@@ -110,6 +104,7 @@ const useProvideTradeExpert = () => {
 
       count: i,
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stagesCount, setDeals, spread]);
 
   const handleStagesCountChange = (count) => {
