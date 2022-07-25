@@ -10,7 +10,7 @@ export const ProvideTradeExpert = ({ children }) => {
 
 /**
  * useTradeExpert - Hook to use TradeExpert
- * @return {{stagesCount:()=>{},handleStagesCountChange:()=>{},handleDealChange:()=>{},spread:number,setSpread:()=>{},deals:{buy:number,sell:number, goal:number, count:number}[],setDeals:{()=>{}},stages:()=>{},setStages:()=>{}}} context
+ * @return {{stagesCount:()=>{},handleStagesCountChange:()=>{},handleDealChange:()=>{} allStagesTotalLoss:number, allStagesTotalProfit:number, allStagesTotalRisk:number,allStagesPureProfit:number,spread:number,setSpread:()=>{},deals:{buy:number,sell:number, goal:number, count:number}[],setDeals:{()=>{}},stages:()=>{},setStages:()=>{}}} context
  */
 export const useTradeExpert = () => {
   return useContext(ctx);
@@ -43,21 +43,18 @@ const useProvideTradeExpert = () => {
   console.log("deals", deals);
   //utils
   const getStageTotalLoss = (stageCount) => {
-    let dealsToThisStage = deals.slice(0, stageCount + 1);
-
     let totalLoss = 0;
-    totalLoss += dealsToThisStage[stageCount]?.sell * spread;
+    totalLoss += deals[stageCount]?.sell * spread;
 
     totalLoss +=
-      dealsToThisStage[stageCount + 1]?.sell * spread +
-      dealsToThisStage[stageCount + 1]?.buy * spread;
+      deals[stageCount + 1]?.sell * spread +
+      deals[stageCount + 1]?.buy * spread;
 
-    dealsToThisStage.forEach((deal, i) => {
+    deals.forEach((deal, i) => {
       //accomualte total loss for this stage
       for (let j = i - 1; j >= 0; j--) {
-        totalLoss += dealsToThisStage[j]?.sell * spread;
-        totalLoss +=
-          dealsToThisStage[j]?.sell * getTotalGoalsValue({ start: j, end: i });
+        totalLoss += deals[j]?.sell * spread;
+        totalLoss += deals[j]?.sell * getTotalGoalsValue({ start: j, end: i });
       }
     });
     return totalLoss;
@@ -73,9 +70,13 @@ const useProvideTradeExpert = () => {
 
   const getTotalProfit = (stageCount) => {
     let totalProfit = 0;
-    for (let i = 0; i < stageCount; i++) {
-      totalProfit += deals[i]?.buy * deals[i]?.goal;
+
+    for (let i = 0; i <= stageCount; i++) {
+      console.log(deals[i].buy, deals[i].sell, deals[i].goal);
+      totalProfit += deals[i].buy * deals[i].goal;
     }
+    console.log("stageCount", stageCount);
+    console.log("totalProfit", totalProfit);
     return totalProfit;
   };
 
@@ -97,15 +98,18 @@ const useProvideTradeExpert = () => {
   };
 
   const stages = useMemo(() => {
-    return Array.from({ length: stagesCount }, (_, i) => ({
-      totalLoss: getStageTotalLoss(i),
-      totalProfit: getTotalProfit(i),
-      totalRisk: getTotalRisk(i),
-
-      count: i,
-    }));
+    let arr = [];
+    for (let i = 0; i < stagesCount; i++) {
+      arr.push({
+        totalLoss: getStageTotalLoss(i),
+        totalProfit: getTotalProfit(i),
+        totalRisk: getTotalRisk(i),
+        count: i,
+      });
+    }
+    return arr;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stagesCount, setDeals, spread]);
+  }, [stagesCount, deals, setDeals, spread]);
 
   const handleStagesCountChange = (count) => {
     setStagesCount(count);
@@ -141,7 +145,36 @@ const useProvideTradeExpert = () => {
     }
   };
 
-  console.log("stages", stages);
+  const allStagesTotalLoss = useMemo(() => {
+    let totalLoss = 0;
+    stages.forEach((stage) => {
+      totalLoss += stage.totalLoss;
+    });
+
+    return totalLoss;
+  }, [stages]);
+
+  const allStagesTotalProfit = useMemo(() => {
+    let totalProfit = 0;
+    stages.forEach((stage) => {
+      totalProfit += stage.totalProfit;
+    });
+
+    return totalProfit;
+  }, [stages]);
+
+  const allStagesTotalRisk = useMemo(() => {
+    let totalRisk = 0;
+    stages.forEach((stage) => {
+      totalRisk += stage.totalRisk;
+    });
+
+    return totalRisk;
+  }, [stages]);
+
+  const allStagesPureProfit = useMemo(() => {
+    return allStagesTotalProfit - allStagesTotalLoss;
+  }, [allStagesTotalProfit, allStagesTotalLoss]);
 
   return {
     stagesCount,
@@ -152,5 +185,9 @@ const useProvideTradeExpert = () => {
     stages,
 
     handleDealChange,
+    allStagesTotalLoss,
+    allStagesTotalProfit,
+    allStagesTotalRisk,
+    allStagesPureProfit,
   };
 };
