@@ -10,7 +10,9 @@ const GoalsResultContainer = () => {
         <GoalResultItem
           key={stage.count}
           label={`صفقة  ${stage.count + 1}`}
-          pureProfit={stage.totalProfit - stage.totalLoss}
+          pureProfit={parseFloat(stage.totalProfit - stage.totalLoss).toFixed(
+            2
+          )}
           totalLoss={stage.totalLoss}
           totalProfit={stage.totalProfit}
           totalRisk={stage.totalRisk}

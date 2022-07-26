@@ -44,25 +44,30 @@ const useProvideTradeExpert = () => {
   //utils
   const getStageTotalLoss = (stageCount) => {
     let totalLoss = 0;
-    totalLoss += deals[stageCount]?.sell * spread;
+    let spreadLoss = 0;
+    let goalLoss = 0;
 
-    totalLoss +=
-      deals[stageCount + 1]?.sell * spread +
-      deals[stageCount + 1]?.buy * spread;
+    let n = stageCount + 1;
 
-    deals.forEach((deal, i) => {
-      //accomualte total loss for this stage
-      for (let j = i - 1; j >= 0; j--) {
-        totalLoss += deals[j]?.sell * spread;
-        totalLoss += deals[j]?.sell * getTotalGoalsValue({ start: j, end: i });
-      }
-    });
+    //spread Losses
+    spreadLoss += deals[n]?.buy * spread;
+    for (let i = 0; i <= n; i++) {
+      spreadLoss += deals[i]?.sell * spread;
+    }
+    console.log("stageCount", stageCount, " spreadLoss", spreadLoss);
+
+    //goal Losses
+    for (let i = 0; i < n; i++) {
+      goalLoss += deals[i]?.sell * getTotalGoalsValue({ start: i, end: n - 2 });
+    }
+    console.log("stageCount", stageCount, " goalLoss", goalLoss);
+    totalLoss = spreadLoss + goalLoss;
     return totalLoss;
   };
 
   const getTotalGoalsValue = ({ start, end }) => {
     let totalGoalsValue = 0;
-    for (let i = start; i < end; i++) {
+    for (let i = start; i <= end; i++) {
       totalGoalsValue += deals[i]?.goal;
     }
     return totalGoalsValue;
@@ -82,18 +87,25 @@ const useProvideTradeExpert = () => {
 
   const getTotalRisk = (stageCount) => {
     let totalRisk = 0;
-    totalRisk += deals[stageCount]?.sell * (spread + deals[stageCount]?.goal);
+    let spreadRisk = 0;
+    let goalRisk = 0;
 
-    totalRisk +=
-      deals[stageCount + 1]?.sell * spread +
-      deals[stageCount + 1]?.buy * spread;
-    for (let i = 0; i < stageCount; i++) {
-      for (let j = i - 1; j >= 0; j--) {
-        totalRisk += deals[j]?.sell * spread;
-        totalRisk +=
-          deals[j]?.sell * getTotalGoalsValue({ start: j, end: i + 1 });
-      }
+    let n = stageCount + 1;
+
+    //spreadRisk
+    spreadRisk += deals[n]?.buy * spread;
+    for (let i = 0; i <= n; i++) {
+      spreadRisk += deals[i]?.sell * spread;
     }
+    console.log("stageCount", stageCount, " spreadRisk", spreadRisk);
+
+    //goalRisk
+    for (let i = 0; i <= n; i++) {
+      goalRisk += deals[i]?.sell * getTotalGoalsValue({ start: i, end: n - 1 });
+    }
+    console.log("stageCount", stageCount, " goalRisk", goalRisk);
+
+    totalRisk = spreadRisk + goalRisk;
     return totalRisk;
   };
 
@@ -101,9 +113,9 @@ const useProvideTradeExpert = () => {
     let arr = [];
     for (let i = 0; i < stagesCount; i++) {
       arr.push({
-        totalLoss: getStageTotalLoss(i),
-        totalProfit: getTotalProfit(i),
-        totalRisk: getTotalRisk(i),
+        totalLoss: parseFloat(getStageTotalLoss(i)).toFixed(4),
+        totalProfit: parseFloat(getTotalProfit(i)).toFixed(4),
+        totalRisk: parseFloat(getTotalRisk(i)).toFixed(4),
         count: i,
       });
     }
