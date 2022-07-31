@@ -19,10 +19,12 @@ const GoalResultItem = ({
           <div className="flex-1 text-center"> اجمالي الخسارة </div>
           <div className="flex-1 text-center"> {totalLoss} </div>
         </div>
-        <div className="flex  flex-col justify-between items-end">
-          <div className="flex-1 text-center"> صافي الربح </div>
-          <div className="flex-1 text-center"> {pureProfit} </div>
-        </div>
+        {pureProfit && (
+          <div className="flex  flex-col justify-between items-end">
+            <div className="flex-1 text-center"> صافي الربح </div>
+            <div className="flex-1 text-center"> {pureProfit} </div>
+          </div>
+        )}
         <div className="flex flex-col justify-between items-end">
           <div className="flex-1 text-center"> اجمالي المخاطرة </div>
           <div className="flex-1 text-center"> {totalRisk} </div>

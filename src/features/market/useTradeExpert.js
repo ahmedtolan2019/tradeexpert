@@ -113,9 +113,9 @@ const useProvideTradeExpert = () => {
     let arr = [];
     for (let i = 0; i < stagesCount; i++) {
       arr.push({
-        totalLoss: parseFloat(getStageTotalLoss(i)).toFixed(4),
-        totalProfit: parseFloat(getTotalProfit(i)).toFixed(4),
-        totalRisk: parseFloat(getTotalRisk(i)).toFixed(4),
+        totalLoss: parseFloat(getStageTotalLoss(i).toFixed(4)),
+        totalProfit: parseFloat(getTotalProfit(i).toFixed(4)),
+        totalRisk: parseFloat(getTotalRisk(i).toFixed(4)),
         count: i,
       });
     }
