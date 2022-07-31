@@ -4,7 +4,7 @@ import StagesToolbar from "../../components/common/StagesToolbar";
 import DealsContainer from "../../components/deals/DealsContainer";
 import GoalsResultContainer from "../../components/Goals/GoalsResultContainer";
 import GoalResultItem from "../../components/Goals/GoalsResultItem";
-import GoalsResultSummary from "../../components/Goals/GoalsResultSummary";
+// import GoalsResultSummary from "../../components/Goals/GoalsResultSummary";
 import { useTradeExpert } from "../../features/market/useTradeExpert";
 import { getTestResult } from "../../lib/testResult";
 
